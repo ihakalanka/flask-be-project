@@ -32,7 +32,7 @@ def create_app():
     
     # Enable CORS with explicit configuration
     CORS(app, 
-         resources={r"/*": {"origins": "http://localhost:3000"}},
+         resources={r"/*": {"origins": "*"}},
          supports_credentials=True,
          allow_headers=["Content-Type", "Authorization"],
          methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
