@@ -1,8 +1,9 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from app.database import init_db
+from app.database import init_db, db_exists
 from datetime import timedelta
+import os
 
 def create_app():
     app = Flask(__name__)
@@ -37,11 +38,13 @@ def create_app():
          methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     )
     
-    # Initialize database
+    # Initialize database (recreate on each cold start for Vercel)
     with app.app_context():
-        init_db()
-        from app.mock_data import insert_mock_data
-        insert_mock_data()
+        # On Vercel, always init since /tmp is ephemeral
+        if os.environ.get('VERCEL') or not db_exists():
+            init_db()
+            from app.mock_data import insert_mock_data
+            insert_mock_data()
     
     # Register blueprints
     from app.routes.auth import auth_bp
